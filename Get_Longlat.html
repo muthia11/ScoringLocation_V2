@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>POS Terdekat</title>
+</head>
+<body>
+  <h2>🔍 Mengambil Koordinat Lokasi</h2>
+  <p>Menentukan lokasi kamu...</p>
+
+  <script>
+    navigator.geolocation.getCurrentPosition(success, error);
+
+    function success(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      // Ganti link Streamlit di bawah ini dengan URL Streamlit Anda
+      window.location.href = `https://scoringlocationv2-mukwsggquy3gzthqgvhl8z.streamlit.app/?lat=${lat}&lon=${lon}`;
+    }
+
+    function error() {
+      document.body.innerHTML = "<p>Gagal mendapatkan lokasi. Pastikan izin lokasi diaktifkan.</p>";
+    }
+  </script>
+</body>
+</html>
