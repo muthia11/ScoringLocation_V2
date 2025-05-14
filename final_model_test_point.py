@@ -26,18 +26,34 @@ def load_excel_from_drive(file_id, sheet_name):
     response = requests.get(url)
     return pd.read_excel(BytesIO(response.content), sheet_name=sheet_name)
 
+
+file_id = "ID_GOOGLE_DRIVE_ANDA"
+url = f"https://drive.google.com/uc?id={file_id}"
+df_kelurahan = pd.read_csv(url)
+
 @st.cache_data
-def load_shapefile_from_drive(file_id):
+def load_csv_from_drive(file_id):
     url = f"https://drive.google.com/uc?id={file_id}"
-    return gpd.read_file(f"/vsizip/vsicurl/{url}")
+    response = requests.get(url)
+    return pd.read_csv(BytesIO(response.content))
 
 poi_file_id = "1a0KEsOZwlNmudx_DBIwj1hB0jWxPXdZB"
-shp_file_id = "1yw_H4H3-G8ViRBGgUKylB992gq4NwrMm"  # Ganti dengan ID ZIP file SHP
+kelurahan_file_id  = "1a0KEsOZwlNmudx_DBIwj1hB0jWxPXdZB"  # Ganti dengan ID ZIP file SHP
 
 data_poi = load_excel_from_drive(poi_file_id, sheet_name='data')
-bw_jawa = load_shapefile_from_drive(shp_file_id)
+bw_jawa = load_csv_from_drive(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
+
+from geopy.distance import geodesic
+
+def cari_kelurahan_terdekat(lat_user, lon_user, df_kelurahan):
+    df_kelurahan['jarak'] = df_kelurahan.apply(
+        lambda row: geodesic((lat_user, lon_user), (row['Latitude'], row['Longitude'])).kilometers, axis=1
+    )
+    return df_kelurahan.loc[df_kelurahan['jarak'].idxmin()]
+
+
 def clean_and_convert_to_wkt(geometry):
     geometry = geometry.strip()
     if geometry.startswith("POLYGON"):
@@ -62,10 +78,11 @@ def is_within_radius(poi, center_point, radius):
     poi_point = (poi['latitude'], poi['longitude'])
     return geodesic(center_point, poi_point).kilometers <= radius
 
-kelurahan = bw_jawa[bw_jawa.contains(input_point)]
-kelurahan_name = kelurahan.iloc[0]['DESA_KELUR'] if not kelurahan.empty else None
-jumlah_pen = kelurahan.iloc[0]['JUMLAH_PEN'] if not kelurahan.empty else None
-luas_wil = kelurahan.iloc[0]['LUAS_WILAY'] if not kelurahan.empty else None
+kelurahan_data = cari_kelurahan_terdekat(latitude, longitude, df_kelurahan)
+kelurahan_name = kelurahan_data['DESA_KELUR']
+jumlah_pen = kelurahan_data['JUMLAH_PEN']
+luas_wil = kelurahan_data['LUAS_WILAY']
+
 
 filtered_poi_df = data_poi[data_poi.apply(is_within_radius, center_point=center_point, radius=radius, axis=1)]
 grouped_poi_count = filtered_poi_df.groupby('grouping').size().to_dict()
