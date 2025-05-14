@@ -66,7 +66,7 @@ grouped_poi_count = filtered_poi_df.groupby('grouping').size().to_dict()
 poi_counts = {cat: grouped_poi_count.get(cat, 0) for cat in poi_categories}
 
 density = jumlah_pen / luas_wil if jumlah_pen and luas_wil else None
-poi_counts.update({'Density': density, 'Kelurahan': kelurahan_name, 'latitude': latitude, 'longitude': longitude})
+poi_counts.update({'Density': density, 'Kelurahan': kelurahan_name, 'latitude': Latitude, 'longitude': Longitude})
 
 # ===== PREDIKSI SCORE POINT =====
 features = ['Density'] + poi_categories + ['month_ke']
