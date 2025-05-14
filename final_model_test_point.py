@@ -23,13 +23,13 @@ longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
 @st.cache_data
 def load_csv_from_drive(file_id):
-    url = f"https://drive.google.com/uc?id={file_id}"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
     response = requests.get(url)
     return pd.read_csv(BytesIO(response.content))
 
 @st.cache_data
 def load_poi_from_drive(file_id):
-    url = f"https://drive.google.com/uc?id={file_id}"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
     response = requests.get(url)
     return pd.read_csv(BytesIO(response.content))
 
