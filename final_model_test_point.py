@@ -25,11 +25,6 @@ def load_excel_from_drive(file_id, sheet_name):
     response = requests.get(url)
     return pd.read_excel(BytesIO(response.content), sheet_name=sheet_name)
 
-
-file_id = "ID_GOOGLE_DRIVE_ANDA"
-url = f"https://drive.google.com/uc?id={file_id}"
-df_kelurahan = pd.read_csv(url)
-
 @st.cache_data
 def load_csv_from_drive(file_id):
     url = f"https://drive.google.com/uc?id={file_id}"
