@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from shapely.geometry import Point
-from shapely.wkt import loads as load_wkt
 from geopy.distance import geodesic
 import joblib
 import requests
@@ -18,94 +17,50 @@ lebar_jalan = st.number_input("Masukkan lebar jalan (meter)", min_value=0.0, ste
 latitude = st.number_input("Latitude lokasi", value=-6.99705, format="%.6f")
 longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
-# ===== LOAD DATA DARI GDRIVE =====
-# import gdown
-
-# @st.cache_data
-# def load_poi_from_drive_gdown(file_id):
-#     url = f"https://drive.google.com/uc?export=download&id={file_id}"
-#     output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
-#     gdown.download(url, output, quiet=False)
-#     return pd.read_csv(output)
-
-# @st.cache_data
-# def load_kelurahan_from_drive_gdown(file_id):
-#     url = f"https://drive.google.com/uc?export=download&id={file_id}"
-#     output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
-#     gdown.download(url, output, quiet=False)
-#     return pd.read_csv(output)
-
-
-# poi_file_id = "1IXTEfQkq8KNNQ32WhGZOJ6d7KCwGG8_C"
-# kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
-
-
-# data_poi = load_poi_from_drive_gdown(poi_file_id)
-# df_kelurahan = load_kelurahan_from_drive_gdown(kelurahan_file_id)
-
+# ===== LOAD DATA =====
 @st.cache_data
-def load_csv_from_dropbox(url: str) -> pd.DataFrame:
+def load_csv_from_url(url: str) -> pd.DataFrame:
     response = requests.get(url)
-    data_poi = pd.read_csv(BytesIO(response.content))
-    st.write("✅ Data berhasil dimuat dari Dropbox")
-    st.write("Kolom:", data_poi.columns.tolist())
-    return data_poi
+    return pd.read_csv(BytesIO(response.content))
 
-# Panggil fungsi dengan URL Dropbox
-dropbox_url = "https://www.dropbox.com/scl/fi/y9xlybpo8s7jr5jf6ex04/data_poi_longlat.csv?rlkey=izmngakklcdqpbt09qpbax3yp&st=mz0zgjag&dl=1"
-data_poi = load_csv_from_dropbox(dropbox_url)
+# Gunakan versi hosting yang stabil (Dropbox/HuggingFace/GitHub raw)
+data_poi_url = "https://huggingface.co/datasets/bayusg/data-poi-public/resolve/main/data_poi_longlat.csv"
+df_kelurahan_url = "https://raw.githubusercontent.com/muthia11/ScoringLocation_V2/main/kelurahan_jawa.csv"
 
-@st.cache_data
-def load_csv2_from_dropbox(url: str) -> pd.DataFrame:
-    response = requests.get(url)
-    df_kelurahan = pd.read_csv(BytesIO(response.content))
-    st.write("✅ Data berhasil dimuat dari Dropbox")
-    st.write("Kolom:", df_kelurahan.columns.tolist())
-    return df_kelurahan
+data_poi = load_csv_from_url(data_poi_url)
+df_kelurahan = load_csv_from_url(df_kelurahan_url)
 
-url = "https://www.dropbox.com/scl/fi/wfjwv3wrbf3whvi7npegb/kelurahan_jawa.csv?rlkey=rr57xijq8f5j9pms8ab16iyw4&st=9c1qqk7j&dl=1"
-df_kelurahan = load_csv2_from_dropbox(url)
-
-# ===== PENGOLAHAN POI =====
-
-from geopy.distance import geodesic
-
-def cari_kelurahan_terdekat(lat_user, lon_user, df_kelurahan):
-    df_kelurahan['jarak'] = df_kelurahan.apply(
+# ===== CARI KELURAHAN TERDEKAT =====
+def cari_kelurahan_terdekat(lat_user, lon_user, df_kel):
+    df_kel['jarak'] = df_kel.apply(
         lambda row: geodesic((lat_user, lon_user), (row['Latitude'], row['Longitude'])).kilometers, axis=1
     )
-    return df_kelurahan.loc[df_kelurahan['jarak'].idxmin()]
+    return df_kel.loc[df_kel['jarak'].idxmin()]
 
-
-def clean_and_convert_to_wkt(geometry):
-    geometry = geometry.strip()
-    if geometry.startswith("POLYGON"):
-        geometry = geometry.replace("POLYGON ((", "POLYGON((").replace("))", "))")
-    elif geometry.startswith("MULTIPOLYGON"):
-        geometry = geometry.replace("MULTIPOLYGON (((", "MULTIPOLYGON(((").replace(")))", ")))" )
-    return geometry
-
-
-poi_categories = ['apartments', 'café', 'community_centre', 'fast_food', 'hospital', 'industrial', 'library',
-                  'market_place', 'military', 'office', 'orchard', 'park', 'pharmacy', 'place_of_worship',
-                  'residential', 'shop', 'stadium', 'tourism']
-
-radius = 2.3
-center_point = (latitude, longitude)
-input_point = Point(longitude, latitude)
-
-def is_within_radius(poi, center_point, radius):
+# ===== CEK POI DALAM RADIUS =====
+def is_within_radius(poi, center_point, radius_km):
     poi_point = (poi['Latitude'], poi['Longitude'])
-    return geodesic(center_point, poi_point).kilometers <= radius
+    return geodesic(center_point, poi_point).kilometers <= radius_km
 
+center_point = (latitude, longitude)
 kelurahan_data = cari_kelurahan_terdekat(latitude, longitude, df_kelurahan)
 kelurahan_name = kelurahan_data['DESA_KELUR']
 jumlah_pen = kelurahan_data['JUMLAH_PEN']
 luas_wil = kelurahan_data['LUAS_WILAY']
 
+filtered_poi_df = data_poi[data_poi.apply(is_within_radius, center_point=center_point, radius_km=2.3, axis=1)]
 
-filtered_poi_df = data_poi[data_poi.apply(is_within_radius, center_point=center_point, radius=radius, axis=1)]
-st.write(filtered_poi_df.head())
+if filtered_poi_df.empty:
+    st.warning("Tidak ada POI dalam radius 2.3 km dari lokasi ini.")
+    st.stop()
+
+if 'grouping' not in filtered_poi_df.columns:
+    st.error("Kolom 'grouping' tidak ditemukan dalam data POI.")
+    st.stop()
+
+poi_categories = ['apartments', 'café', 'community_centre', 'fast_food', 'hospital', 'industrial', 'library',
+                  'market_place', 'military', 'office', 'orchard', 'park', 'pharmacy', 'place_of_worship',
+                  'residential', 'shop', 'stadium', 'tourism']
 
 grouped_poi_count = filtered_poi_df.groupby('grouping').size().to_dict()
 poi_counts = {cat: grouped_poi_count.get(cat, 0) for cat in poi_categories}
@@ -167,5 +122,3 @@ st.write(f"**Durasi Mobil:** {durasi_mobil:.2f} jam")
 st.write(f"**Score Point:** {score_point:.2f}")
 st.write(f"**Score Traffic:** {score_traffic:.2f}")
 st.success(f"\U0001F3AF **Score Final Walk-in:** {score_final:.2f}")
-
-
