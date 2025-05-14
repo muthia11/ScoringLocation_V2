@@ -31,11 +31,11 @@ data_poi = load_csv_from_url(data_poi_url)
 df_kelurahan = load_csv_from_url(df_kelurahan_url)
 
 # ===== CARI KELURAHAN TERDEKAT =====
-def cari_kelurahan_terdekat(lat_user, lon_user, df_kel):
-    df_kel['jarak'] = df_kel.apply(
+def cari_kelurahan_terdekat(lat_user, lon_user, df_kelurahan):
+    df_kelurahan['jarak'] = df_kelurahan.apply(
         lambda row: geodesic((lat_user, lon_user), (row['Latitude'], row['Longitude'])).kilometers, axis=1
     )
-    return df_kel.loc[df_kel['jarak'].idxmin()]
+    return df_kelurahan.loc[df_kelurahan['jarak'].idxmin()]
 
 # ===== CEK POI DALAM RADIUS =====
 def is_within_radius(poi, center_point, radius_km):
@@ -66,7 +66,7 @@ grouped_poi_count = filtered_poi_df.groupby('grouping').size().to_dict()
 poi_counts = {cat: grouped_poi_count.get(cat, 0) for cat in poi_categories}
 
 density = jumlah_pen / luas_wil if jumlah_pen and luas_wil else None
-poi_counts.update({'Density': density, 'Kelurahan': kelurahan_name, 'latitude': Latitude, 'longitude': Longitude})
+poi_counts.update({'Density': density, 'Kelurahan': kelurahan_name, 'latitude': latitude, 'longitude': longitude})
 
 # ===== PREDIKSI SCORE POINT =====
 features = ['Density'] + poi_categories + ['month_ke']
