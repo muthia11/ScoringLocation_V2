@@ -36,6 +36,8 @@ def load_csv_from_drive_semicolon(file_id):
 poi_file_id = "1_Yw9FV0gM3v-8mFucVxdO4LfuziNhEgP"
 kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
 
+st.write("Kolom tersedia:", data_poi.columns.tolist())
+
 data_poi = load_csv_from_drive_semicolon(poi_file_id)
 bw_jawa = load_csv_from_drive(kelurahan_file_id)
 
