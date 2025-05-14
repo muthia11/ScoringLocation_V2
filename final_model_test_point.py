@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import geopandas as gpd
 from shapely.geometry import Point
 from shapely.wkt import loads as load_wkt
 from geopy.distance import geodesic
