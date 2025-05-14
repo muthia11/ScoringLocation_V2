@@ -79,6 +79,8 @@ luas_wil = kelurahan_data['LUAS_WILAY']
 
 
 filtered_poi_df = data_poi[data_poi.apply(is_within_radius, center_point=center_point, radius=radius, axis=1)]
+st.write(filtered_poi_df.head())
+
 grouped_poi_count = filtered_poi_df.groupby('grouping').size().to_dict()
 poi_counts = {cat: grouped_poi_count.get(cat, 0) for cat in poi_categories}
 
