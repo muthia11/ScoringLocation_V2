@@ -32,7 +32,7 @@ def load_csv_from_drive(file_id):
     return pd.read_csv(BytesIO(response.content))
 
 poi_file_id = "1a0KEsOZwlNmudx_DBIwj1hB0jWxPXdZB"
-kelurahan_file_id  = "1a0KEsOZwlNmudx_DBIwj1hB0jWxPXdZB"  # Ganti dengan ID ZIP file SHP
+kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py"  # Ganti dengan ID ZIP file SHP
 
 data_poi = load_excel_from_drive(poi_file_id, sheet_name='data')
 bw_jawa = load_csv_from_drive(kelurahan_file_id)
