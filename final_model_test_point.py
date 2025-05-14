@@ -68,6 +68,35 @@ poi_counts = {cat: grouped_poi_count.get(cat, 0) for cat in poi_categories}
 density = jumlah_pen / luas_wil if jumlah_pen and luas_wil else None
 poi_counts.update({'Density': density, 'Kelurahan': kelurahan_name, 'latitude': latitude, 'longitude': longitude})
 
+# ===== IMPORT MODEL =====
+
+import os
+
+def download_file_from_github(url, local_filename):
+    if not os.path.exists(local_filename):
+        response = requests.get(url)
+        with open(local_filename, 'wb') as f:
+            f.write(response.content)
+
+base_url = "https://github.com/muthia11/ScoringLocation_V2/blob/main/"
+
+model_files = {
+    "scaler_point.pkl": base_url + "scaler_point.pkl",
+    "model_point_only.pkl": base_url + "model_point_only.pkl",
+    "model_type_motor.pkl": base_url + "model_type_motor.pkl",
+    "model_type_mobil.pkl": base_url + "model_type_mobil.pkl",
+    "model_dur_motor.pkl": base_url + "model_dur_motor.pkl",
+    "model_dur_mobil.pkl": base_url + "model_dur_mobil.pkl",
+    "model_traffic.pkl": base_url + "model_traffic.pkl",
+    "model_final(point&traffic).pkl": base_url + "model_final(point&traffic).pkl",
+    "le_motor.pkl": base_url + "le_motor.pkl",
+    "le_mobil.pkl": base_url + "le_mobil.pkl"
+}
+
+for local_name, url in model_files.items():
+    download_file_from_github(url, local_name)
+
+
 # ===== PREDIKSI SCORE POINT =====
 features = ['Density'] + poi_categories + ['month_ke']
 result_df = pd.DataFrame([poi_counts])
@@ -81,15 +110,6 @@ result_df['pred_walk_in'] = poisson_model.predict(X_new_scaled)
 result_df['score_point'] = round(result_df['pred_walk_in'] / 2 * 100, 2).apply(lambda x: min(x, 100))
 score_point = result_df['score_point'].values[0]
 
-# ===== PREDIKSI SCORE TRAFFIC =====
-model_type_motor = joblib.load("model_type_motor.pkl")
-model_type_mobil = joblib.load("model_type_mobil.pkl")
-model_dur_motor = joblib.load("model_dur_motor.pkl")
-model_dur_mobil = joblib.load("model_dur_mobil.pkl")
-model_walkin = joblib.load("model_traffic.pkl")
-model_final = joblib.load("model_final(point&traffic).pkl")
-le_motor = joblib.load("le_motor.pkl")
-le_mobil = joblib.load("le_mobil.pkl")
 
 total_kendaraan = total_motor + total_mobil
 X_traffic = pd.DataFrame({'total_traffic': [total_kendaraan], 'lebar_jalan': [lebar_jalan]})
