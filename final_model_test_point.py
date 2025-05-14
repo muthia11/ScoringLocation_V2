@@ -19,29 +19,35 @@ latitude = st.number_input("Latitude lokasi", value=-6.99705, format="%.6f")
 longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
 # ===== LOAD DATA DARI GDRIVE =====
-import gdown
+# import gdown
 
-@st.cache_data
-def load_poi_from_drive_gdown(file_id):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
-    gdown.download(url, output, quiet=False)
-    return pd.read_csv(output)
+# @st.cache_data
+# def load_poi_from_drive_gdown(file_id):
+#     url = f"https://drive.google.com/uc?export=download&id={file_id}"
+#     output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
+#     gdown.download(url, output, quiet=False)
+#     return pd.read_csv(output)
 
-@st.cache_data
-def load_kelurahan_from_drive_gdown(file_id):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
-    gdown.download(url, output, quiet=False)
-    return pd.read_csv(output)
-
-
-poi_file_id = "1IXTEfQkq8KNNQ32WhGZOJ6d7KCwGG8_C"
-kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
+# @st.cache_data
+# def load_kelurahan_from_drive_gdown(file_id):
+#     url = f"https://drive.google.com/uc?export=download&id={file_id}"
+#     output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
+#     gdown.download(url, output, quiet=False)
+#     return pd.read_csv(output)
 
 
-data_poi = load_poi_from_drive_gdown(poi_file_id)
-df_kelurahan = load_kelurahan_from_drive_gdown(kelurahan_file_id)
+# poi_file_id = "1IXTEfQkq8KNNQ32WhGZOJ6d7KCwGG8_C"
+# kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
+
+
+# data_poi = load_poi_from_drive_gdown(poi_file_id)
+# df_kelurahan = load_kelurahan_from_drive_gdown(kelurahan_file_id)
+
+url = "https://www.dropbox.com/scl/fi/y9xlybpo8s7jr5jf6ex04/data_poi_longlat.csv?rlkey=izmngakklcdqpbt09qpbax3yp&st=mz0zgjag&dl=1"
+data_poi = pd.read_csv(url)
+
+url = "https://www.dropbox.com/scl/fi/wfjwv3wrbf3whvi7npegb/kelurahan_jawa.csv?rlkey=rr57xijq8f5j9pms8ab16iyw4&st=9c1qqk7j&dl=1"
+df_kelurahan = pd.read_csv(url)
 
 # ===== PENGOLAHAN POI =====
 
