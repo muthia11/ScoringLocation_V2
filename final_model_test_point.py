@@ -19,26 +19,29 @@ latitude = st.number_input("Latitude lokasi", value=-6.99705, format="%.6f")
 longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
 # ===== LOAD DATA DARI GDRIVE =====
-
-
-@st.cache_data
-def load_csv_from_drive(file_id):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    response = requests.get(url)
-    return pd.read_csv(BytesIO(response.content))
+import gdown
 
 @st.cache_data
-def load_poi_from_drive(file_id):
+def load_poi_from_drive_gdown(file_id):
     url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    response = requests.get(url)
-    return pd.read_csv(BytesIO(response.content))
+    output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
+    gdown.download(url, output, quiet=False)
+    return pd.read_csv(output)
+
+@st.cache_data
+def load_kelurahan_from_drive_gdown(file_id):
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    output = "/tmp/data_poi.csv"  # Temporary file (tidak perlu simpan selamanya)
+    gdown.download(url, output, quiet=False)
+    return pd.read_csv(output)
+
 
 poi_file_id = "1IXTEfQkq8KNNQ32WhGZOJ6d7KCwGG8_C"
 kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
 
 
-data_poi = load_poi_from_drive(poi_file_id)
-df_kelurahan = load_csv_from_drive(kelurahan_file_id)
+data_poi = load_poi_from_drive_gdown(poi_file_id)
+df_kelurahan = load_kelurahan_from_drive_gdown(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
 
