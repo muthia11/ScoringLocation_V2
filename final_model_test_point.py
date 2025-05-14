@@ -7,7 +7,7 @@ import requests
 from io import BytesIO
 
 st.set_page_config(page_title="Prediksi Walk-in POS", layout="centered")
-st.title("\U0001F4CD Prediksi Walk-in POS berdasarkan Lokasi & Traffic")
+st.title("\U0001F4CD Scoring Lokasi POS")
 
 # ===== INPUT USER =====
 total_motor = st.number_input("Masukkan jumlah kendaraan motor", min_value=0, step=10)
@@ -39,7 +39,7 @@ def cari_kelurahan_terdekat(lat_user, lon_user, df_kel):
 
 # ===== CEK POI DALAM RADIUS =====
 def is_within_radius(poi, center_point, radius_km):
-    poi_point = (poi['latitude'], poi['longitude'])
+    poi_point = (poi['Latitude'], poi['Longitude'])
     return geodesic(center_point, poi_point).kilometers <= radius_km
 
 center_point = (latitude, longitude)
