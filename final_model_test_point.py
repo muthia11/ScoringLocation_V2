@@ -38,7 +38,7 @@ kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py"
 
 
 data_poi = load_poi_from_drive(poi_file_id)
-bw_jawa = load_csv_from_drive(kelurahan_file_id)
+df_kelurahan = load_csv_from_drive(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
 
