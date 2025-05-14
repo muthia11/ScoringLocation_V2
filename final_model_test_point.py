@@ -28,16 +28,16 @@ def load_csv_from_drive(file_id):
     return pd.read_csv(BytesIO(response.content))
 
 @st.cache_data
-def load_csv_from_drive_semicolon(file_id):
+def load_poi_from_drive(file_id):
     url = f"https://drive.google.com/uc?id={file_id}"
     response = requests.get(url)
-    return pd.read_csv(BytesIO(response.content), sep=';')
+    return pd.read_csv(BytesIO(response.content))
 
-poi_file_id = "1_Yw9FV0gM3v-8mFucVxdO4LfuziNhEgP"
+poi_file_id = "1IXTEfQkq8KNNQ32WhGZOJ6d7KCwGG8_C"
 kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
 
 
-data_poi = load_csv_from_drive_semicolon(poi_file_id)
+data_poi = load_poi_from_drive(poi_file_id)
 bw_jawa = load_csv_from_drive(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
@@ -63,9 +63,6 @@ if 'geometry' not in data_poi.columns:
     st.error("Kolom 'geometry' tidak ditemukan dalam data_poi.")
     st.stop()
 
-data_poi['geometry_wkt'] = data_poi['geometry'].apply(clean_and_convert_to_wkt)
-data_poi['longitude'], data_poi['latitude'] = zip(*data_poi['geometry_wkt'].apply(lambda wkt: load_wkt(wkt).centroid.coords[0]))
-data_poi.dropna(subset=['longitude', 'latitude'], inplace=True)
 
 poi_categories = ['apartments', 'café', 'community_centre', 'fast_food', 'hospital', 'industrial', 'library',
                   'market_place', 'military', 'office', 'orchard', 'park', 'pharmacy', 'place_of_worship',
@@ -76,7 +73,7 @@ center_point = (latitude, longitude)
 input_point = Point(longitude, latitude)
 
 def is_within_radius(poi, center_point, radius):
-    poi_point = (poi['latitude'], poi['longitude'])
+    poi_point = (poi['Latitude'], poi['Longitude'])
     return geodesic(center_point, poi_point).kilometers <= radius
 
 kelurahan_data = cari_kelurahan_terdekat(latitude, longitude, df_kelurahan)
