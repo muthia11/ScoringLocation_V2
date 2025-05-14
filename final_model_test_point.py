@@ -20,10 +20,11 @@ longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
 # ===== LOAD DATA DARI GDRIVE =====
 @st.cache_data
-def load_excel_from_drive(file_id, sheet_name):
+def load_poi_from_drive(file_id):
     url = f"https://drive.google.com/uc?id={file_id}"
     response = requests.get(url)
-    return pd.read_excel(BytesIO(response.content), sheet_name=sheet_name)
+    return pd.read_csv(BytesIO(response.content))
+
 
 @st.cache_data
 def load_csv_from_drive(file_id):
@@ -31,10 +32,10 @@ def load_csv_from_drive(file_id):
     response = requests.get(url)
     return pd.read_csv(BytesIO(response.content))
 
-poi_file_id = "1a0KEsOZwlNmudx_DBIwj1hB0jWxPXdZB"
+poi_file_id = "1_Yw9FV0gM3v-8mFucVxdO4LfuziNhEgP"
 kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py"  # Ganti dengan ID ZIP file SHP
 
-data_poi = load_excel_from_drive(poi_file_id, sheet_name='data')
+data_poi = load_poi_from_drive(poi_file_id)
 bw_jawa = load_csv_from_drive(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
