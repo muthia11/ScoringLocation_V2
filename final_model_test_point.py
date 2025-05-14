@@ -24,7 +24,7 @@ def load_csv_from_url(url: str) -> pd.DataFrame:
     return pd.read_csv(BytesIO(response.content))
 
 # Gunakan versi hosting yang stabil (Dropbox/HuggingFace/GitHub raw)
-data_poi_url = "https://huggingface.co/datasets/bayusg/data-poi-public/resolve/main/data_poi_longlat.csv"
+data_poi_url = "https://storage.cloud.google.com/data_poi_jawa/data_poi_longlat.csv"
 df_kelurahan_url = "https://raw.githubusercontent.com/muthia11/ScoringLocation_V2/main/kelurahan_jawa.csv"
 
 data_poi = load_csv_from_url(data_poi_url)
