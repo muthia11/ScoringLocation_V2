@@ -59,6 +59,10 @@ def clean_and_convert_to_wkt(geometry):
         geometry = geometry.replace("MULTIPOLYGON (((", "MULTIPOLYGON(((").replace(")))", ")))" )
     return geometry
 
+if 'geometry' not in data_poi.columns:
+    st.error("Kolom 'geometry' tidak ditemukan dalam data_poi.")
+    st.stop()
+
 data_poi['geometry_wkt'] = data_poi['geometry'].apply(clean_and_convert_to_wkt)
 data_poi['longitude'], data_poi['latitude'] = zip(*data_poi['geometry_wkt'].apply(lambda wkt: load_wkt(wkt).centroid.coords[0]))
 data_poi.dropna(subset=['longitude', 'latitude'], inplace=True)
