@@ -39,7 +39,7 @@ def cari_kelurahan_terdekat(lat_user, lon_user, df_kel):
 
 # ===== CEK POI DALAM RADIUS =====
 def is_within_radius(poi, center_point, radius_km):
-    poi_point = (poi['Latitude'], poi['Longitude'])
+    poi_point = (poi['latitude'], poi['longitude'])
     return geodesic(center_point, poi_point).kilometers <= radius_km
 
 center_point = (latitude, longitude)
