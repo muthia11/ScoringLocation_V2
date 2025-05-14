@@ -19,11 +19,6 @@ latitude = st.number_input("Latitude lokasi", value=-6.99705, format="%.6f")
 longitude = st.number_input("Longitude lokasi", value=110.34607, format="%.6f")
 
 # ===== LOAD DATA DARI GDRIVE =====
-@st.cache_data
-def load_poi_from_drive(file_id):
-    url = f"https://drive.google.com/uc?id={file_id}"
-    response = requests.get(url)
-    return pd.read_csv(BytesIO(response.content))
 
 
 @st.cache_data
@@ -32,10 +27,16 @@ def load_csv_from_drive(file_id):
     response = requests.get(url)
     return pd.read_csv(BytesIO(response.content))
 
-poi_file_id = "1_Yw9FV0gM3v-8mFucVxdO4LfuziNhEgP"
-kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py"  # Ganti dengan ID ZIP file SHP
+@st.cache_data
+def load_csv_from_drive_semicolon(file_id):
+    url = f"https://drive.google.com/uc?id={file_id}"
+    response = requests.get(url)
+    return pd.read_csv(BytesIO(response.content), sep=';')
 
-data_poi = load_poi_from_drive(poi_file_id)
+poi_file_id = "1_Yw9FV0gM3v-8mFucVxdO4LfuziNhEgP"
+kelurahan_file_id  = "1ojKlx-hS9dA9zkDj-f5S9q2_t2ACI3Py" 
+
+data_poi = load_csv_from_drive_semicolon(poi_file_id)
 bw_jawa = load_csv_from_drive(kelurahan_file_id)
 
 # ===== PENGOLAHAN POI =====
