@@ -59,10 +59,6 @@ def clean_and_convert_to_wkt(geometry):
         geometry = geometry.replace("MULTIPOLYGON (((", "MULTIPOLYGON(((").replace(")))", ")))" )
     return geometry
 
-if 'geometry' not in data_poi.columns:
-    st.error("Kolom 'geometry' tidak ditemukan dalam data_poi.")
-    st.stop()
-
 
 poi_categories = ['apartments', 'café', 'community_centre', 'fast_food', 'hospital', 'industrial', 'library',
                   'market_place', 'military', 'office', 'orchard', 'park', 'pharmacy', 'place_of_worship',
