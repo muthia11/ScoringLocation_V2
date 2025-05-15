@@ -78,7 +78,7 @@ def download_file_from_github(url, local_filename):
         with open(local_filename, 'wb') as f:
             f.write(response.content)
 
-base_url = "https://github.com/muthia11/ScoringLocation_V2/blob/main/"
+base_url = "https://raw.githubusercontent.com/muthia11/ScoringLocation_V2/main/"
 
 model_files = {
     "scaler_point.pkl": base_url + "scaler_point.pkl",
