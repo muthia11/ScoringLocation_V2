@@ -110,6 +110,12 @@ result_df['pred_walk_in'] = poisson_model.predict(X_new_scaled)
 result_df['score_point'] = round(result_df['pred_walk_in'] / 2 * 100, 2).apply(lambda x: min(x, 100))
 score_point = result_df['score_point'].values[0]
 
+# ===== LOAD MODEL TRAFFIC =====
+model_type_motor = joblib.load("model_type_motor.pkl")
+model_type_mobil = joblib.load("model_type_mobil.pkl")
+model_dur_motor = joblib.load("model_dur_motor.pkl")
+model_dur_mobil = joblib.load("model_dur_mobil.pkl")
+
 
 total_kendaraan = total_motor + total_mobil
 X_traffic = pd.DataFrame({'total_traffic': [total_kendaraan], 'lebar_jalan': [lebar_jalan]})
@@ -131,6 +137,10 @@ score_traffic = (predicted_walkin / 2) * 100
 X_final = pd.DataFrame({'score_pos_poi': [score_point], 'score_traffic': [score_traffic]})
 final_prediction = model_final.predict(X_final)[0]
 score_final = round(final_prediction / 2 * 100, 2)
+
+
+le_motor = joblib.load("le_motor.pkl")
+le_mobil = joblib.load("le_mobil.pkl")
 
 # ===== OUTPUT =====
 st.subheader("\U0001F4CA Hasil Prediksi")
